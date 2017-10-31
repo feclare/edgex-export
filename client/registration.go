@@ -19,6 +19,8 @@ import (
 	"gopkg.in/mgo.v2/bson"
 )
 
+var registrationChanges chan bool
+
 func getRegByID(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json; charset=utf-8")
 
@@ -174,6 +176,7 @@ func addReg(w http.ResponseWriter, r *http.Request) {
 	}
 
 	w.WriteHeader(http.StatusCreated)
+	notifyRegistrationChange()
 }
 
 func updateReg(w http.ResponseWriter, r *http.Request) {
@@ -208,6 +211,7 @@ func updateReg(w http.ResponseWriter, r *http.Request) {
 	}
 
 	w.WriteHeader(http.StatusOK)
+	notifyRegistrationChange()
 }
 
 func delRegByID(w http.ResponseWriter, r *http.Request) {
@@ -225,6 +229,7 @@ func delRegByID(w http.ResponseWriter, r *http.Request) {
 	}
 
 	w.WriteHeader(http.StatusOK)
+	notifyRegistrationChange()
 }
 
 func delRegByName(w http.ResponseWriter, r *http.Request) {
@@ -242,4 +247,15 @@ func delRegByName(w http.ResponseWriter, r *http.Request) {
 	}
 
 	w.WriteHeader(http.StatusOK)
+	notifyRegistrationChange()
+}
+
+func SetNotification(ch chan bool) {
+	registrationChanges = ch
+}
+
+func notifyRegistrationChange() {
+	if registrationChanges != nil {
+		registrationChanges <- true
+	}
 }

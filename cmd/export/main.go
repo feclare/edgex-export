@@ -70,6 +70,10 @@ func main() {
 
 	errs := make(chan error, 2)
 
+	registrationChanges := make(chan bool, 2)
+	client.SetNotification(registrationChanges)
+	distro.SetNotification(registrationChanges)
+
 	go func() {
 		p := fmt.Sprintf(":%d", cfg.ClientPort)
 		logger.Info("Starting Export Client", zap.String("url", p))

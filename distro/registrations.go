@@ -23,6 +23,8 @@ import (
 	"go.uber.org/zap"
 )
 
+var registrationChanges chan bool
+
 // To be removed when any other formater is implemented
 type dummyFormat struct {
 }
@@ -157,6 +159,8 @@ func Loop(repo *mongo.Repository, errChan chan error) {
 			}
 			logger.Info("exit msg", zap.Error(e))
 			return
+		case <-registrationChanges:
+			logger.Info("Registration changes")
 
 		case <-time.After(time.Millisecond / 10):
 			// Simulate receiving 10k events/seg
@@ -166,4 +170,8 @@ func Loop(repo *mongo.Repository, errChan chan error) {
 			}
 		}
 	}
+}
+
+func SetNotification(ch chan bool) {
+	registrationChanges = ch
 }
