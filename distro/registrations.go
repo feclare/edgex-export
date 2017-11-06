@@ -230,8 +230,14 @@ func Loop(repo *mongo.Repository, errChan chan error) {
 				if reg.deleteMe {
 					delete(registrations, k)
 				} else {
-					// TODO only sent event if it is not blocking
-					reg.chEvent <- event
+					// Only sent event if it is not blocking
+					select {
+					case reg.chEvent <- event:
+					default:
+						logger.Debug("Could not sent event",
+							zap.String("Name", reg.registration.Name))
+					}
+
 				}
 			}
 		}
